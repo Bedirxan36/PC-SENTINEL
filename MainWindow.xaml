@@ -1,0 +1,815 @@
+<Window x:Class="SENTINEL.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:SENTINEL.ViewModels"
+        Title="SENTINEL - Siber Güvenlik Tarayıcısı" 
+        Height="850" Width="1500"
+        Background="{StaticResource BackgroundBrush}"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        ResizeMode="CanResize"
+        Icon="uygicon.ico">
+    
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+    
+    <Window.Effect>
+        <DropShadowEffect Color="Black" BlurRadius="40" ShadowDepth="0" Opacity="0.5"/>
+    </Window.Effect>
+
+    <Border CornerRadius="20" Background="{StaticResource BackgroundBrush}" BorderThickness="1" BorderBrush="#2D2D44">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Custom Title Bar -->
+            <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}" 
+                    CornerRadius="20,20,0,0" Height="60" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid Margin="30,0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource PrimaryGradient}">
+                            <TextBlock Text="🛡️" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Margin="15,0,0,0" VerticalAlignment="Center">
+                            <TextBlock FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}">
+                                <Run Text="SENTINEL"/>
+                            </TextBlock>
+                            <TextBlock Text="Security Scanner" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>
+                        </StackPanel>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Button Content="─" Width="40" Height="40" Click="MinimizeButton_Click"
+                                Style="{StaticResource TitleBarButton}"/>
+                        <Button Content="□" Width="40" Height="40" Click="MaximizeButton_Click"
+                                Style="{StaticResource TitleBarButton}"/>
+                        <Button Content="✕" Width="40" Height="40" Click="CloseButton_Click"
+                                Style="{StaticResource TitleBarButton}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Main Content with TabControl -->
+            <TabControl Grid.Row="1" Background="Transparent" BorderThickness="0" Margin="20">
+                <TabControl.Resources>
+                    <Style TargetType="TabItem" BasedOn="{StaticResource ModernTab}"/>
+                </TabControl.Resources>
+
+                <!-- Tab 1: Ana Dashboard -->
+                <TabItem Header="🏠 Ana Sayfa">
+                    <Grid Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="400"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Left Panel - Security Score -->
+                        <Border Grid.Column="0" Style="{StaticResource GlassCard}" Margin="0,0,15,0">
+                            <StackPanel>
+                                <TextBlock Text="GÜVENLIK SKORU" FontSize="13" FontWeight="SemiBold" 
+                                           Foreground="{StaticResource TextSecondaryBrush}" 
+                                           Margin="0,0,0,30"/>
+                                
+                                <!-- Circular Progress -->
+                                <Grid Width="240" Height="240" Margin="0,20">
+                                    <Ellipse Stroke="#1E293B" StrokeThickness="24" Width="240" Height="240"/>
+                                    <Ellipse x:Name="ProgressCircle" StrokeThickness="24" Width="240" Height="240" 
+                                             StrokeDashArray="754" 
+                                             StrokeDashOffset="{Binding SecurityScore, Converter={StaticResource ScoreToOffsetConverter}}"
+                                             RenderTransformOrigin="0.5,0.5">
+                                        <Ellipse.RenderTransform>
+                                            <RotateTransform Angle="-90"/>
+                                        </Ellipse.RenderTransform>
+                                        <Ellipse.Stroke>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                <GradientStop Color="#4F46E5" Offset="0"/>
+                                                <GradientStop Color="#7C3AED" Offset="0.5"/>
+                                                <GradientStop Color="#EC4899" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Ellipse.Stroke>
+                                        <Ellipse.Effect>
+                                            <DropShadowEffect Color="#7C3AED" BlurRadius="30" ShadowDepth="0" Opacity="0.6"/>
+                                        </Ellipse.Effect>
+                                    </Ellipse>
+                                    
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding SecurityScore}" FontSize="64" FontWeight="Bold" 
+                                                   Foreground="{StaticResource TextPrimaryBrush}" 
+                                                   HorizontalAlignment="Center"/>
+                                        <TextBlock Text="/ 100" FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" 
+                                                   HorizontalAlignment="Center" Margin="0,-5,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <Border Background="{StaticResource SurfaceBrush}" CornerRadius="12" 
+                                        Padding="20" Margin="0,30,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding RiskLevel}" FontSize="20" FontWeight="Bold" 
+                                                   Foreground="{StaticResource TextPrimaryBrush}" 
+                                                   HorizontalAlignment="Center"/>
+                                        <TextBlock Text="Risk Seviyesi" FontSize="12" 
+                                                   Foreground="{StaticResource TextSecondaryBrush}" 
+                                                   HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                                        <TextBlock Text="{Binding LastScanTime}" FontSize="10" 
+                                                   Foreground="{StaticResource TextSecondaryBrush}" 
+                                                   HorizontalAlignment="Center" Margin="0,10,0,0" Opacity="0.7"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Button Content="🔍  TAM TARAMA BAŞLAT" 
+                                        Command="{Binding StartScanCommand}"
+                                        Style="{StaticResource ModernButton}"
+                                        Margin="0,30,0,0" Height="50"/>
+
+                                <TextBlock Text="{Binding ScanStatus}" FontSize="12" 
+                                           Foreground="{StaticResource TextSecondaryBrush}" 
+                                           HorizontalAlignment="Center" Margin="0,15,0,0" 
+                                           TextWrapping="Wrap" TextAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Right Panel - Details -->
+                        <Grid Grid.Column="1" Margin="15,0,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Security Issues -->
+                            <Border Grid.Row="0" Style="{StaticResource GlassCard}" Margin="0,0,0,15">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    
+                                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
+                                        <Border Width="36" Height="36" CornerRadius="8" Background="#FEF2F2">
+                                            <TextBlock Text="⚠" FontSize="18" Foreground="{StaticResource DangerBrush}" 
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                            <TextBlock Text="GÜVENLİK UYARILARI" FontSize="14" FontWeight="SemiBold" 
+                                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+                                            <TextBlock Text="Tespit edilen güvenlik açıkları" FontSize="11" 
+                                                       Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    
+                                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                        <ItemsControl ItemsSource="{Binding SecurityIssues}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Background="{StaticResource SurfaceBrush}" 
+                                                            CornerRadius="10" Padding="16" Margin="0,0,0,10">
+                                                        <TextBlock Text="{Binding}" 
+                                                                   Foreground="{StaticResource TextPrimaryBrush}" 
+                                                                   FontSize="13" TextWrapping="Wrap"/>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Border>
+
+                            <!-- Open Ports -->
+                            <Border Grid.Row="1" Style="{StaticResource GlassCard}" Margin="0,15,0,15">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    
+                                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
+                                        <Border Width="36" Height="36" CornerRadius="8" Background="#FEF9C3">
+                                            <TextBlock Text="🔓" FontSize="18" Foreground="{StaticResource WarningBrush}" 
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                            <TextBlock Text="AÇIK PORTLAR" FontSize="14" FontWeight="SemiBold" 
+                                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+                                            <TextBlock Text="Ağ güvenliği analizi" FontSize="11" 
+                                                       Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    
+                                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                        <ItemsControl ItemsSource="{Binding OpenPorts}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Background="{StaticResource SurfaceBrush}" 
+                                                            CornerRadius="10" Padding="16" Margin="0,0,0,10">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            
+                                                            <Border Grid.Column="0" Background="{StaticResource DangerBrush}" 
+                                                                    CornerRadius="8" Padding="12,6" Opacity="0.9">
+                                                                <TextBlock Text="{Binding Port}" 
+                                                                           Foreground="White" FontWeight="Bold" FontSize="13"/>
+                                                            </Border>
+                                                            
+                                                            <TextBlock Grid.Column="1" Text="{Binding ServiceName}" 
+                                                                       Foreground="{StaticResource TextPrimaryBrush}" 
+                                                                       FontSize="13" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Border>
+
+                            <!-- Password Analyzer -->
+                            <Border Grid.Row="2" Style="{StaticResource GlassCard}">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                        <Border Width="36" Height="36" CornerRadius="8" Background="#DBEAFE">
+                                            <TextBlock Text="🔐" FontSize="18" Foreground="{StaticResource InfoBrush}" 
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                            <TextBlock Text="ŞİFRE GÜVENLİĞİ ANALİZİ" FontSize="14" FontWeight="SemiBold" 
+                                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+                                            <TextBlock Text="Şifre gücünü test edin" FontSize="11" 
+                                                       Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <TextBox x:Name="PasswordTextBox" Grid.Column="0" 
+                                                 Text="{Binding PasswordInput, UpdateSourceTrigger=PropertyChanged}" 
+                                                 Style="{StaticResource ModernTextBox}"
+                                                 Height="48"/>
+                                        
+                                        <Button Grid.Column="1" Content="ANALİZ ET" 
+                                                Click="AnalyzePassword_Click"
+                                                Background="{StaticResource SuccessGradient}"
+                                                Foreground="White" FontWeight="SemiBold" FontSize="13"
+                                                Padding="24,0" Margin="12,0,0,0" Height="48"
+                                                BorderThickness="0" Cursor="Hand">
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="Button">
+                                                                <Border x:Name="border" 
+                                                                        Background="{TemplateBinding Background}" 
+                                                                        CornerRadius="12" 
+                                                                        Padding="{TemplateBinding Padding}">
+                                                                    <ContentPresenter HorizontalAlignment="Center" 
+                                                                                      VerticalAlignment="Center"/>
+                                                                </Border>
+                                                                <ControlTemplate.Triggers>
+                                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                                        <Setter TargetName="border" Property="Opacity" Value="0.9"/>
+                                                                    </Trigger>
+                                                                </ControlTemplate.Triggers>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </TabItem>
+
+                <!-- Tab 2: Detaylı Dashboard -->
+                <TabItem Header="📊 Detaylı Dashboard">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,10,0,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- System Metrics -->
+                            <Grid Grid.Row="0" Margin="0,0,0,20">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- CPU Card -->
+                                <Border Grid.Column="0" Style="{StaticResource GlassCard}" Margin="0,0,10,0">
+                                    <StackPanel>
+                                        <TextBlock Text="💻 CPU KULLANIMI" FontSize="12" 
+                                                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,15"/>
+                                        <TextBlock FontSize="36" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}">
+                                            <Run Text="{Binding CpuUsage, StringFormat={}{0:F1}}"/><Run Text="%" FontSize="20"/>
+                                        </TextBlock>
+                                        <ProgressBar Style="{StaticResource ModernProgressBar}" Value="{Binding CpuUsage}" Maximum="100" Height="8" 
+                                                     Margin="0,15,0,0" Background="#1E293B" 
+                                                     Foreground="{StaticResource PrimaryGradient}" BorderThickness="0"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- RAM Card -->
+                                <Border Grid.Column="1" Style="{StaticResource GlassCard}" Margin="10,0">
+                                    <StackPanel>
+                                        <TextBlock Text="🧠 RAM KULLANIMI" FontSize="12" 
+                                                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,15"/>
+                                        <TextBlock FontSize="36" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}">
+                                            <Run Text="{Binding RamUsage, StringFormat={}{0:F1}}"/><Run Text="%" FontSize="20"/>
+                                        </TextBlock>
+                                        <ProgressBar Style="{StaticResource ModernProgressBar}" Value="{Binding RamUsage}" Maximum="100" Height="8" 
+                                                     Margin="0,15,0,0" Background="#1E293B" 
+                                                     Foreground="{StaticResource SuccessGradient}" BorderThickness="0"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Disk Card -->
+                                <Border Grid.Column="2" Style="{StaticResource GlassCard}" Margin="10,0">
+                                    <StackPanel>
+                                        <TextBlock Text="💾 DİSK KULLANIMI" FontSize="12" 
+                                                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,15"/>
+                                        <TextBlock FontSize="36" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}">
+                                            <Run Text="{Binding DiskUsage, StringFormat={}{0:F1}}"/><Run Text="%" FontSize="20"/>
+                                        </TextBlock>
+                                        <ProgressBar Style="{StaticResource ModernProgressBar}" Value="{Binding DiskUsage}" Maximum="100" Height="8" 
+                                                     Margin="0,15,0,0" Background="#1E293B" 
+                                                     Foreground="{StaticResource WarningBrush}" BorderThickness="0"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Network Card -->
+                                <Border Grid.Column="3" Style="{StaticResource GlassCard}" Margin="10,0,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="🌐 AKTİF BAĞLANTI" FontSize="12" 
+                                                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,15"/>
+                                        <TextBlock Text="{Binding ActiveConnections}" FontSize="36" FontWeight="Bold" 
+                                                   Foreground="{StaticResource TextPrimaryBrush}"/>
+                                        <TextBlock Text="Bağlantı" FontSize="12" 
+                                                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <!-- Recommendations -->
+                            <Border Grid.Row="1" Style="{StaticResource GlassCard}" Margin="0,0,0,20">
+                                <StackPanel>
+                                    <TextBlock Text="💡 GÜVENLİK ÖNERİLERİ" FontSize="16" FontWeight="Bold" 
+                                               Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,20"/>
+                                    <ItemsControl ItemsSource="{Binding Recommendations}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="{StaticResource SurfaceBrush}" 
+                                                        CornerRadius="12" Padding="20" Margin="0,0,0,15">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <Border Grid.Column="0" Width="48" Height="48" CornerRadius="10" 
+                                                                Background="#FEF2F2" VerticalAlignment="Top">
+                                                            <TextBlock Text="⚡" FontSize="24" 
+                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+
+                                                        <StackPanel Grid.Column="1" Margin="20,0">
+                                                            <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="SemiBold" 
+                                                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="{Binding Description}" FontSize="13" 
+                                                                       Foreground="{StaticResource TextSecondaryBrush}" 
+                                                                       Margin="0,8,0,0" TextWrapping="Wrap"/>
+                                                            <TextBlock Text="{Binding Category}" FontSize="11" 
+                                                                       Foreground="{StaticResource InfoBrush}" 
+                                                                       Margin="0,8,0,0"/>
+                                                        </StackPanel>
+
+                                                        <Border Grid.Column="2" Background="{StaticResource DangerBrush}" 
+                                                                CornerRadius="8" Padding="12,6" VerticalAlignment="Top">
+                                                            <TextBlock Text="{Binding Priority}" Foreground="White" 
+                                                                       FontSize="11" FontWeight="SemiBold"/>
+                                                        </Border>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Network Connections -->
+                            <Border Grid.Row="2" Style="{StaticResource GlassCard}">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                                        <TextBlock Text="🌐 AĞ BAĞLANTILARI" FontSize="16" FontWeight="Bold" 
+                                                   Foreground="{StaticResource TextPrimaryBrush}"/>
+                                        <Button Content="🔄 Yenile" Click="RefreshNetwork_Click"
+                                                Background="{StaticResource InfoBrush}" Foreground="White"
+                                                Padding="12,6" Margin="20,0,0,0" BorderThickness="0" 
+                                                Cursor="Hand" FontSize="11">
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="Button">
+                                                                <Border Background="{TemplateBinding Background}" 
+                                                                        CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                                                    <ContentPresenter/>
+                                                                </Border>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </StackPanel>
+                                    
+                                    <ItemsControl ItemsSource="{Binding NetworkConnections}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="{StaticResource SurfaceBrush}" 
+                                                        CornerRadius="10" Padding="16" Margin="0,0,0,10">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <Border Grid.Column="0" Background="{StaticResource InfoBrush}" 
+                                                                CornerRadius="6" Padding="8,4">
+                                                            <TextBlock Text="{Binding Protocol}" Foreground="White" 
+                                                                       FontSize="11" FontWeight="Bold"/>
+                                                        </Border>
+
+                                                        <StackPanel Grid.Column="1" Margin="15,0">
+                                                            <TextBlock Foreground="{StaticResource TextPrimaryBrush}" FontSize="12">
+                                                                <Run Text="{Binding LocalAddress}"/> → <Run Text="{Binding RemoteAddress}"/>
+                                                            </TextBlock>
+                                                        </StackPanel>
+
+                                                        <TextBlock Grid.Column="2" Text="{Binding State}" 
+                                                                   Foreground="{StaticResource SuccessBrush}" 
+                                                                   FontSize="11" FontWeight="SemiBold"/>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- Tab 3: Sistem Bilgileri -->
+                <TabItem Header="💻 Sistem Bilgileri">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,10,0,0">
+                        <StackPanel>
+                            <!-- Yükleme Butonu -->
+                            <Border Style="{StaticResource GlassCard}" Margin="0,0,0,20">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Button Content="🔍 SİSTEM BİLGİLERİNİ TARA" 
+                                            Command="{Binding LoadSystemInfoCommand}"
+                                            Style="{StaticResource ModernButton}"
+                                            Height="50" Padding="30,0"/>
+                                    <TextBlock Text="Sistem donanım bilgilerini yükle" 
+                                               Foreground="{StaticResource TextSecondaryBrush}" 
+                                               VerticalAlignment="Center" Margin="20,0,0,0" FontSize="12"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Sistem Bilgileri Grid -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Sol Kolon -->
+                                <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                    <!-- İşletim Sistemi -->
+                                    <Border Style="{StaticResource GlassCard}" Margin="0,0,0,20">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                                                <Border Width="40" Height="40" CornerRadius="10" Background="#DBEAFE">
+                                                    <TextBlock Text="🖥️" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <TextBlock Text="İŞLETİM SİSTEMİ" FontSize="16" FontWeight="Bold" 
+                                                           Foreground="{StaticResource TextPrimaryBrush}" 
+                                                           VerticalAlignment="Center" Margin="15,0,0,0"/>
+                                            </StackPanel>
+                                            
+                                            <StackPanel DataContext="{Binding SystemInfo}">
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="İşletim Sistemi" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding OsName}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="Sürüm" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding OsVersion}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="Mimari" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding OsArchitecture}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="Bilgisayar Adı" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding ComputerName}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="Kullanıcı" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding UserName}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                                <Grid>
+                                                    <TextBlock Text="Çalışma Süresi" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding SystemUptime}" Foreground="{StaticResource SuccessBrush}" 
+                                                               FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- İşlemci -->
+                                    <Border Style="{StaticResource GlassCard}" Margin="0,0,0,20">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                                                <Border Width="40" Height="40" CornerRadius="10" Background="#FEF2F2">
+                                                    <TextBlock Text="⚡" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <TextBlock Text="İŞLEMCİ" FontSize="16" FontWeight="Bold" 
+                                                           Foreground="{StaticResource TextPrimaryBrush}" 
+                                                           VerticalAlignment="Center" Margin="15,0,0,0"/>
+                                            </StackPanel>
+                                            
+                                            <StackPanel DataContext="{Binding SystemInfo}">
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="Model" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding CpuName}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right" TextWrapping="Wrap" TextAlignment="Right"/>
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="Üretici" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding CpuManufacturer}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="Çekirdek Sayısı" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding CpuCores}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="Mantıksal İşlemci" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding CpuLogicalProcessors}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="Maksimum Hız" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding CpuMaxSpeed}" Foreground="{StaticResource SuccessBrush}" 
+                                                               FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                                <Grid>
+                                                    <TextBlock Text="Mimari" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding CpuArchitecture}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Bellek -->
+                                    <Border Style="{StaticResource GlassCard}" Margin="0,0,0,20">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                                                <Border Width="40" Height="40" CornerRadius="10" Background="#F0FDF4">
+                                                    <TextBlock Text="🧠" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <TextBlock Text="BELLEK (RAM)" FontSize="16" FontWeight="Bold" 
+                                                           Foreground="{StaticResource TextPrimaryBrush}" 
+                                                           VerticalAlignment="Center" Margin="15,0,0,0"/>
+                                            </StackPanel>
+                                            
+                                            <StackPanel DataContext="{Binding SystemInfo}">
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="Toplam RAM" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding TotalRam}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="Kullanılan" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding UsedRam}" Foreground="{StaticResource WarningBrush}" 
+                                                               FontSize="13" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="Kullanılabilir" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding AvailableRam}" Foreground="{StaticResource SuccessBrush}" 
+                                                               FontSize="13" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="RAM Slot Sayısı" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding RamSlots}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                                <Grid>
+                                                    <TextBlock Text="Hız" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding RamSpeed}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- Sağ Kolon -->
+                                <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                    <!-- Ekran Kartı -->
+                                    <Border Style="{StaticResource GlassCard}" Margin="0,0,0,20">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                                                <Border Width="40" Height="40" CornerRadius="10" Background="#FEF9C3">
+                                                    <TextBlock Text="🎮" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <TextBlock Text="EKRAN KARTI" FontSize="16" FontWeight="Bold" 
+                                                           Foreground="{StaticResource TextPrimaryBrush}" 
+                                                           VerticalAlignment="Center" Margin="15,0,0,0"/>
+                                            </StackPanel>
+                                            
+                                            <StackPanel DataContext="{Binding SystemInfo}">
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="Model" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding GpuName}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right" TextWrapping="Wrap" TextAlignment="Right"/>
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="Sürücü Sürümü" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding GpuDriverVersion}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="Bellek" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding GpuMemory}" Foreground="{StaticResource SuccessBrush}" 
+                                                               FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                                <Grid>
+                                                    <TextBlock Text="Çözünürlük" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding GpuResolution}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Anakart -->
+                                    <Border Style="{StaticResource GlassCard}" Margin="0,0,0,20">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                                                <Border Width="40" Height="40" CornerRadius="10" Background="#F3E8FF">
+                                                    <TextBlock Text="🔌" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <TextBlock Text="ANAKART" FontSize="16" FontWeight="Bold" 
+                                                           Foreground="{StaticResource TextPrimaryBrush}" 
+                                                           VerticalAlignment="Center" Margin="15,0,0,0"/>
+                                            </StackPanel>
+                                            
+                                            <StackPanel DataContext="{Binding SystemInfo}">
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="Üretici" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding MotherboardManufacturer}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="Model" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding MotherboardProduct}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                                <Grid>
+                                                    <TextBlock Text="BIOS Sürümü" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding BiosVersion}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Ağ -->
+                                    <Border Style="{StaticResource GlassCard}" Margin="0,0,0,20">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                                                <Border Width="40" Height="40" CornerRadius="10" Background="#DBEAFE">
+                                                    <TextBlock Text="🌐" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <TextBlock Text="AĞ BİLGİLERİ" FontSize="16" FontWeight="Bold" 
+                                                           Foreground="{StaticResource TextPrimaryBrush}" 
+                                                           VerticalAlignment="Center" Margin="15,0,0,0"/>
+                                            </StackPanel>
+                                            
+                                            <StackPanel DataContext="{Binding SystemInfo}">
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="Ağ Adaptörü" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding NetworkAdapter}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right" TextWrapping="Wrap" TextAlignment="Right"/>
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <TextBlock Text="IP Adresi" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding IpAddress}" Foreground="{StaticResource SuccessBrush}" 
+                                                               FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                                <Grid>
+                                                    <TextBlock Text="MAC Adresi" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                    <TextBlock Text="{Binding MacAddress}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                               FontSize="13" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Diskler -->
+                            <Border Style="{StaticResource GlassCard}">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                                        <Border Width="40" Height="40" CornerRadius="10" Background="#FEF2F2">
+                                            <TextBlock Text="💾" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <TextBlock Text="DEPOLAMA CİHAZLARI" FontSize="16" FontWeight="Bold" 
+                                                   Foreground="{StaticResource TextPrimaryBrush}" 
+                                                   VerticalAlignment="Center" Margin="15,0,0,0"/>
+                                    </StackPanel>
+                                    
+                                    <ItemsControl ItemsSource="{Binding SystemInfo.Disks}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="{StaticResource SurfaceBrush}" 
+                                                        CornerRadius="12" Padding="20" Margin="0,0,0,15">
+                                                    <StackPanel>
+                                                        <Grid Margin="0,0,0,15">
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <Border Background="{StaticResource InfoBrush}" 
+                                                                        CornerRadius="8" Padding="12,6">
+                                                                    <TextBlock Text="{Binding Name}" Foreground="White" 
+                                                                               FontSize="14" FontWeight="Bold"/>
+                                                                </Border>
+                                                                <TextBlock Text="{Binding Type}" Foreground="{StaticResource TextSecondaryBrush}" 
+                                                                           FontSize="12" VerticalAlignment="Center" Margin="15,0,0,0"/>
+                                                            </StackPanel>
+                                                            <TextBlock Text="{Binding FileSystem}" Foreground="{StaticResource TextSecondaryBrush}" 
+                                                                       FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                                        </Grid>
+                                                        
+                                                        <Grid Margin="0,0,0,8">
+                                                            <TextBlock Text="Toplam Boyut" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                            <TextBlock Text="{Binding TotalSize}" Foreground="{StaticResource TextPrimaryBrush}" 
+                                                                       FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                                        </Grid>
+                                                        <Grid Margin="0,0,0,8">
+                                                            <TextBlock Text="Kullanılan" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                            <TextBlock Text="{Binding UsedSpace}" Foreground="{StaticResource WarningBrush}" 
+                                                                       FontSize="13" HorizontalAlignment="Right"/>
+                                                        </Grid>
+                                                        <Grid Margin="0,0,0,12">
+                                                            <TextBlock Text="Boş Alan" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                            <TextBlock Text="{Binding FreeSpace}" Foreground="{StaticResource SuccessBrush}" 
+                                                                       FontSize="13" HorizontalAlignment="Right"/>
+                                                        </Grid>
+                                                        
+                                                        <ProgressBar Style="{StaticResource ModernProgressBar}" Value="{Binding UsedPercentage}" Maximum="100" Height="8" 
+                                                                     Background="#1E293B" Foreground="{StaticResource DangerBrush}" BorderThickness="0"/>
+                                                        <TextBlock Text="{Binding UsedPercentage, StringFormat={}%{0:F1} Dolu}" 
+                                                                   Foreground="{StaticResource TextSecondaryBrush}" 
+                                                                   FontSize="11" HorizontalAlignment="Right" Margin="0,5,0,0"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </Border>
+</Window>
