@@ -178,9 +178,9 @@ MIT License - Detaylar için [LICENSE](LICENSE) dosyasına bakın.
 
 ## 📧 İletişim
 
-Proje Sahibi - [@yourusername](https://github.com/yourusername)
+Proje Sahibi - [@Bedirxan36](https://github.com/Bedirxan36)
 
-Proje Linki: [https://github.com/yourusername/SENTINEL](https://github.com/yourusername/SENTINEL)
+Proje Linki: [https://github.com/Bedirxan36/SENTINEL](https://github.com/Bedirxan36/SENTINEL)
 
 ## 🙏 Teşekkürler
 
@@ -191,3 +191,4 @@ Proje Linki: [https://github.com/yourusername/SENTINEL](https://github.com/youru
 ---
 
 ⭐ Bu projeyi beğendiyseniz yıldız vermeyi unutmayın!
+
